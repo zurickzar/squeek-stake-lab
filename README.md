@@ -1,39 +1,87 @@
-Squeek Stake Lab 🐹
+⚡ Squeek Builder Hub
 
-An independent Squeekchain staking power simulator.
+A free, interactive Web3 learning playground.
 
-Squeek Stake Lab is a free, interactive utility designed to help Squeekchain users understand how Squeek levels and staked SQK affect estimated staking power.
+Squeek Builder Hub brings blockchain education and security practice into one simple experience. Built for learners who want to understand Web3 through interactive lessons and challenges.
 
-Features
+🚀 Live Demo
 
-- Calculate Squeek power by level.
-- Simulate SQK staking power.
-- Compare different staking configurations.
-- Explore staking scenarios before making decisions.
-- No wallet connection or transaction required.
+- "Squeek Builder Hub" (https://zurickzar.github.io/squeek-stake-lab/hub.html)
+- "Squeek Academy" (https://zurickzar.github.io/squeek-stake-lab/academy.html)
+- "Challenge Lab V2" (https://zurickzar.github.io/squeek-stake-lab/challenge.html)
+- "Challenge Lab V3" (https://zurickzar.github.io/squeek-stake-lab/challenge-v3.html)
 
-Technology
+✨ Features
 
-- HTML
-- CSS
-- JavaScript
-- No paid APIs or dependencies.
+📚 Squeek Academy
 
-Calculation Reference
+- Interactive blockchain lessons
+- Practice activities
+- Knowledge quizzes
+- Learning progress saved locally
 
-Based on Squeekchain's published Sepolia staking parameters and developer documentation.
+🧠 Challenge Lab V2
 
-- Base Squeek power starts at 1,000.
-- Each level scales by 2.2.
-- SQK base rate: 40 SQK per power unit.
-- Reference power: 1,000.
+- Blockchain safety challenges
+- Decision-making simulations
+- XP rewards and progress tracking
 
-Disclaimer
+⚡ Challenge Lab V3
 
-This is an independent community-built simulation tool. It is not an official Squeekchain product and does not execute blockchain transactions.
+- Daily learning challenges
+- XP and level progression
+- Achievement badges
+- Local leaderboard simulation
+- Progress saved in the browser
 
-The calculations reflect published testnet parameters and should not be treated as a live mainnet quote.
+🏠 Builder Hub
 
-Repository
+- One central dashboard
+- Quick access to all learning modules
+- Simple, responsive interface
 
-Built independently for the Squeekchain community.
+🛠️ Built With
+
+- HTML5
+- CSS3
+- Vanilla JavaScript
+- Browser LocalStorage
+- GitHub Pages
+
+No paid APIs, external backend, or wallet connection required.
+
+🔐 Safety First
+
+This project is an educational simulation.
+
+- No wallet connection is required.
+- No private keys or seed phrases are requested.
+- No blockchain transactions are performed.
+- Progress data is stored locally in the user's browser.
+- The leaderboard is a local simulation, not a global ranking.
+
+🗺️ Roadmap
+
+- [x] Squeek Academy MVP
+- [x] Challenge Lab V2 MVP
+- [x] Challenge Lab V3 MVP
+- [x] Builder Hub V1
+- [ ] Improve mobile experience
+- [ ] Expand interactive learning content
+- [ ] Improve accessibility and documentation
+- [ ] Add more security scenarios
+
+▶️ Getting Started
+
+1. Open the "Builder Hub" (https://zurickzar.github.io/squeek-stake-lab/hub.html).
+2. Choose a learning module.
+3. Complete lessons and challenges.
+4. Track your progress and achievements.
+
+📄 License
+
+License information has not yet been specified.
+
+---
+
+Built as a free Web3 education project.
