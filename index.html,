@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Squeek Stake Lab</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;padding:22px;
+  background:#10131b;color:#f4f5f8;
+  font-family:Arial,sans-serif;
+}
+main{max-width:520px;margin:auto}
+h1{color:#c6a4ff;margin-bottom:5px}
+.sub{color:#a6adbd;font-size:14px}
+.card{
+  background:#1c2230;padding:18px;
+  border-radius:14px;margin-top:18px;
+  border:1px solid #343c4e;
+}
+label{display:block;margin:15px 0 7px}
+input,select{
+  width:100%;padding:13px;border-radius:9px;
+  border:1px solid #454e63;
+  background:#101722;color:white;font-size:16px;
+}
+button{
+  width:100%;padding:14px;margin-top:20px;
+  background:#a879ed;color:#171020;
+  border:0;border-radius:10px;
+  font-size:16px;font-weight:bold;
+}
+.result{
+  background:#29213b;padding:16px;
+  border-radius:10px;margin-top:15px;
+}
+.big{font-size:30px;color:#d0b2ff;font-weight:bold}
+.line{display:flex;justify-content:space-between;
+  gap:12px;padding:9px 0;border-bottom:1px solid #424052}
+small{color:#a6adbd;line-height:1.6}
+footer{margin-top:20px;color:#929bad;font-size:12px}
+</style>
+</head>
+<body>
+<main>
+<h1>🐹 Squeek Stake Lab</h1>
+<p class="sub">Free Squeekchain staking power simulator</p>
+
+<div class="card">
+<h3>Your staking setup</h3>
+
+<label>Squeek level</label>
+<select id="level">
+<option value="1">Level 1</option>
+<option value="2">Level 2</option>
+<option value="3">Level 3</option>
+<option value="4">Level 4</option>
+<option value="5">Level 5</option>
+<option value="6">Level 6</option>
+<option value="7">Level 7</option>
+<option value="8">Level 8</option>
+<option value="9">Level 9</option>
+<option value="10">Level 10</option>
+</select>
+
+<label>Number of Squeeks</label>
+<input id="count" type="number" min="0" step="1" value="1">
+
+<label>Amount of SQK staked</label>
+<input id="sqk" type="number" min="0" step="any" value="0">
+
+<button onclick="calculate()">Calculate Power</button>
+
+<div class="result">
+<small>Estimated total staking power</small>
+<div class="big" id="total">1,000</div>
+</div>
+
+<div class="line">
+<span>Squeek power</span>
+<strong id="p">1,000</strong>
+</div>
+<div class="line">
+<span>SQK boosted power</span>
+<strong id="q">0</strong>
+</div>
+<div class="line">
+<span>Total power</span>
+<strong id="w">1,000</strong>
+</div>
+</div>
+
+<div class="card">
+<h3>About this tool</h3>
+<p class="sub">
+Calculate your estimated Squeekchain staking power
+before making staking decisions.
+</p>
+<small>
+This is an independent community utility.
+Simulation only. No wallet connection, transactions
+or financial guarantees.
+</small>
+</div>
+
+<footer>
+Squeek Stake Lab · Independent community project<br>
+Formula reference: Squeekchain official developer documentation.
+</footer>
+</main>
+
+<script>
+const powers=[
+0,1000,2200,4840,10648,23426,
+51536,113380,249436,548759,1207269
+];
+
+function calculate(){
+ const level=Number(document.getElementById("level").value);
+ const count=Math.max(0,Math.floor(Number(document.getElementById("count").value)||0));
+ const sqk=Math.max(0,Number(document.getElementById("sqk").value)||0);
+
+ const P=powers[level]*count;
+ const Q=(sqk/40)*(1+P/1000);
+ const W=P+Q;
+
+ const fmt=n=>n.toLocaleString("en-US",{
+ maximumFractionDigits:4
+ });
+
+ document.getElementById("p").textContent=fmt(P);
+ document.getElementById("q").textContent=fmt(Q);
+ document.getElementById("w").textContent=fmt(W);
+ document.getElementById("total").textContent=fmt(W);
+}
+calculate();
+</script>
+</body>
+</html>
