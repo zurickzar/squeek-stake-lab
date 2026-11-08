@@ -2,40 +2,42 @@ Squeek Mailroom
 
 A hardware-connected sorting puzzle game for the Squeekchain ecosystem.
 
-Squeek Mailroom is a browser-based game where players sort incoming packages into the correct destinations: FOOD, TOOLS, or TOYS.
-
-The game reads public Squeekchain hardware measurements and uses real wheel activity to enrich the gameplay experience.
+Squeek Mailroom is a browser-based game where players sort incoming packages into the correct destinations: FOOD, TOOLS, or TOYS. Live wheel activity makes the conveyor animation and sorting challenge respond to real hardware RPM.
 
 Live Demo
 
-https://zurickzar.github.io/squeek-stake-lab/mailroom-v3-2.html
+Current playable version — V3.3 RPM Sync
+
+https://zurickzar.github.io/squeek-stake-lab/mailroom-v3-3-rpm-sync.html
 
 Core Features
 
 - Interactive package-sorting gameplay.
-- Live hardware status from the Squeekchain public API.
-- RPM and distance readings.
-- XP and level progression.
-- Daily sorting mission.
-- Special Delivery bonuses.
-- Local progress persistence.
-- Practice mode when live hardware data is unavailable.
+- Live hardware status from the public Squeekchain API.
+- Live RPM and total-distance readings.
+- Conveyor animation speed synchronized with live RPM.
+- Sorting timer adjusts to the available RPM reading.
+- XP, levels, combos, and lives.
+- Daily sorting mission and Special Delivery milestones.
+- Local progress persistence in the browser.
+- Practice mode when valid live hardware data is unavailable.
+- Reduced-motion accessibility support.
 
 Hardware Integration
 
 The game reads public measurement data from:
 
-"https://api.squeekchain.com/v1/status"
+https://api.squeekchain.com/v1/status
 
-Hardware readings are displayed with freshness and provenance checks.
+Hardware readings are accepted only when the API reports hardware provenance, online freshness, valid numeric measurements, and a recent observation timestamp.
 
-The game does not claim that local XP or bonuses are official tokens, on-chain rewards, or settled protocol rewards.
+The interface falls back to Practice Mode when valid live hardware data is unavailable.
 
 How to Play
 
 1. Open the live demo.
 2. Check whether LIVE HARDWARE is available.
-3. Sort each package into FOOD, TOOLS, or TOYS.
+3. Sort each package into FOOD, TOOLS, or TOYS before the timer expires.
 4. Build combos, earn local XP, and complete daily missions.
 
 Supporting Modules
@@ -47,22 +49,23 @@ This repository also contains supporting learning and safety modules:
 - Challenge Lab V3
 - Builder Hub
 
-These modules complement the main Squeek Mailroom experience.
+These modules complement the main Squeek Mailroom game.
 
 Technical Notes
 
 - Built with HTML, CSS, and JavaScript.
-- Uses the public Squeekchain API.
-- No API key required for public status reads.
+- Uses the public Squeekchain status API.
+- No API key is required for public status reads.
+- No wallet connection or blockchain transaction is required to play.
 - Browser localStorage is used for local game progress.
-- Practice mode is available when hardware data is unavailable.
+- Practice mode is available when valid live hardware data is unavailable.
 
 Project Status
 
-Mailroom V3.2 is the current stable playable version.
+Current playable release: Mailroom V3.3 RPM Sync.
 
-This project is independently developed. Genesis attribution and verification requirements will be added after the official verification process provides the required details.
+This is an independently developed project. Genesis attribution and verification have not yet been completed; any required verification details will be added only after the official process provides them.
 
 Disclaimer
 
-Local XP and gameplay bonuses are in-game progress only. They do not represent guaranteed financial value, token rewards, or on-chain earnings.
+XP, levels, and gameplay bonuses are local in-game progress only. They are not official tokens, guaranteed financial value, or confirmed on-chain rewards.
