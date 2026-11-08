@@ -1,87 +1,68 @@
-⚡ Squeek Builder Hub
+Squeek Mailroom
 
-A free, interactive Web3 learning playground.
+A hardware-connected sorting puzzle game for the Squeekchain ecosystem.
 
-Squeek Builder Hub brings blockchain education and security practice into one simple experience. Built for learners who want to understand Web3 through interactive lessons and challenges.
+Squeek Mailroom is a browser-based game where players sort incoming packages into the correct destinations: FOOD, TOOLS, or TOYS.
 
-🚀 Live Demo
+The game reads public Squeekchain hardware measurements and uses real wheel activity to enrich the gameplay experience.
 
-- "Squeek Builder Hub" (https://zurickzar.github.io/squeek-stake-lab/hub.html)
-- "Squeek Academy" (https://zurickzar.github.io/squeek-stake-lab/academy.html)
-- "Challenge Lab V2" (https://zurickzar.github.io/squeek-stake-lab/challenge.html)
-- "Challenge Lab V3" (https://zurickzar.github.io/squeek-stake-lab/challenge-v3.html)
+Live Demo
 
-✨ Features
+https://zurickzar.github.io/squeek-stake-lab/mailroom-v3-2.html
 
-📚 Squeek Academy
+Core Features
 
-- Interactive blockchain lessons
-- Practice activities
-- Knowledge quizzes
-- Learning progress saved locally
+- Interactive package-sorting gameplay.
+- Live hardware status from the Squeekchain public API.
+- RPM and distance readings.
+- XP and level progression.
+- Daily sorting mission.
+- Special Delivery bonuses.
+- Local progress persistence.
+- Practice mode when live hardware data is unavailable.
 
-🧠 Challenge Lab V2
+Hardware Integration
 
-- Blockchain safety challenges
-- Decision-making simulations
-- XP rewards and progress tracking
+The game reads public measurement data from:
 
-⚡ Challenge Lab V3
+"https://api.squeekchain.com/v1/status"
 
-- Daily learning challenges
-- XP and level progression
-- Achievement badges
-- Local leaderboard simulation
-- Progress saved in the browser
+Hardware readings are displayed with freshness and provenance checks.
 
-🏠 Builder Hub
+The game does not claim that local XP or bonuses are official tokens, on-chain rewards, or settled protocol rewards.
 
-- One central dashboard
-- Quick access to all learning modules
-- Simple, responsive interface
+How to Play
 
-🛠️ Built With
+1. Open the live demo.
+2. Check whether LIVE HARDWARE is available.
+3. Sort each package into FOOD, TOOLS, or TOYS.
+4. Build combos, earn local XP, and complete daily missions.
 
-- HTML5
-- CSS3
-- Vanilla JavaScript
-- Browser LocalStorage
-- GitHub Pages
+Supporting Modules
 
-No paid APIs, external backend, or wallet connection required.
+This repository also contains supporting learning and safety modules:
 
-🔐 Safety First
+- Academy
+- Challenge Lab V2
+- Challenge Lab V3
+- Builder Hub
 
-This project is an educational simulation.
+These modules complement the main Squeek Mailroom experience.
 
-- No wallet connection is required.
-- No private keys or seed phrases are requested.
-- No blockchain transactions are performed.
-- Progress data is stored locally in the user's browser.
-- The leaderboard is a local simulation, not a global ranking.
+Technical Notes
 
-🗺️ Roadmap
+- Built with HTML, CSS, and JavaScript.
+- Uses the public Squeekchain API.
+- No API key required for public status reads.
+- Browser localStorage is used for local game progress.
+- Practice mode is available when hardware data is unavailable.
 
-- [x] Squeek Academy MVP
-- [x] Challenge Lab V2 MVP
-- [x] Challenge Lab V3 MVP
-- [x] Builder Hub V1
-- [ ] Improve mobile experience
-- [ ] Expand interactive learning content
-- [ ] Improve accessibility and documentation
-- [ ] Add more security scenarios
+Project Status
 
-▶️ Getting Started
+Mailroom V3.2 is the current stable playable version.
 
-1. Open the "Builder Hub" (https://zurickzar.github.io/squeek-stake-lab/hub.html).
-2. Choose a learning module.
-3. Complete lessons and challenges.
-4. Track your progress and achievements.
+This project is independently developed. Genesis attribution and verification requirements will be added after the official verification process provides the required details.
 
-📄 License
+Disclaimer
 
-License information has not yet been specified.
-
----
-
-Built as a free Web3 education project.
+Local XP and gameplay bonuses are in-game progress only. They do not represent guaranteed financial value, token rewards, or on-chain earnings.
