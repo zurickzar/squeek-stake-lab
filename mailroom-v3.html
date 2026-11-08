@@ -1,0 +1,233 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Squeek Mailroom V3</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101827;color:#eef4ff;font-family:Arial,sans-serif;padding:20px}
+main{max-width:650px;margin:auto}
+h1{margin-bottom:5px;color:#f5c96a}
+.sub{color:#a9bad1;font-size:14px}
+.panel{background:#1b293d;border:1px solid #34455e;border-radius:15px;padding:17px;margin:15px 0}
+.status{font-size:13px;padding:8px 12px;border-radius:20px;display:inline-block;background:#35445a}
+.green{color:#8ff0b1}.yellow{color:#ffdc83}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.stat{background:#263750;border-radius:10px;padding:12px;text-align:center}
+.stat strong{display:block;font-size:23px;margin-top:5px}
+.package{font-size:58px;text-align:center;margin:12px}
+.destination{text-align:center;font-size:22px;font-weight:bold}
+button{border:0;border-radius:10px;padding:14px 10px;font-weight:bold;font-size:15px;background:#f2c66d;color:#172033;cursor:pointer}
+button:active{transform:scale(.97)}
+.buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+button.secondary{background:#354963;color:white}
+.small{font-size:12px;color:#a9bad1;line-height:1.5}
+#message{min-height:25px;text-align:center;color:#f5d68b;font-weight:bold}
+.progress{height:10px;background:#354963;border-radius:10px;overflow:hidden}
+#bar{height:100%;width:0;background:#f2c66d}
+</style>
+</head>
+<body>
+<main>
+<h1>📦 Squeek Mailroom V3</h1>
+<div class="sub">Special Delivery · Hardware-powered sorting game</div>
+
+<section class="panel">
+<div id="hardware" class="status yellow">CONNECTING TO HARDWARE...</div>
+<div class="stats" style="margin-top:15px">
+<div class="stat">Wheel RPM<strong id="rpm">--</strong></div>
+<div class="stat">Distance<strong id="distance">--</strong></div>
+<div class="stat">Mode<strong id="mode">...</strong></div>
+</div>
+<p class="small" id="updated">Checking Squeekchain status...</p>
+</section>
+
+<section class="panel">
+<div class="stats">
+<div class="stat">Score<strong id="score">0</strong></div>
+<div class="stat">Combo<strong id="combo">0</strong></div>
+<div class="stat">Lives<strong id="lives">3</strong></div>
+</div>
+<div style="text-align:center;margin-top:18px">
+<div class="small">LEVEL</div>
+<strong id="level" style="font-size:30px">1</strong>
+</div>
+<div class="package" id="package">📦</div>
+<div class="destination" id="destination">Paket berikutnya</div>
+<p class="small" style="text-align:center">Pilih tempat tujuan paket yang benar.</p>
+<div class="buttons">
+<button onclick="sort('FOOD')">🍎 FOOD</button>
+<button onclick="sort('TOOLS')">🔧 TOOLS</button>
+<button onclick="sort('TOYS')">🧸 TOYS</button>
+</div>
+<p id="message"></p>
+<button class="secondary" style="width:100%" onclick="newGame()">Restart Game</button>
+</section>
+
+<section class="panel">
+<h3>⭐ Special Delivery</h3>
+<div id="special">Menunggu aktivitas hardware...</div>
+<p class="small">Milestone RPM dan jarak sesi dapat membuka paket spesial. Bonus hanya XP lokal.</p>
+</section>
+
+<section class="panel">
+<h3>🎯 Daily Mission</h3>
+<p id="mission">0 / 20 paket benar</p>
+<div class="progress"><div id="bar"></div></div>
+<p class="small">Hadiah: 20 XP lokal setelah 20 paket benar.</p>
+<h3>XP: <span id="xp">0</span></h3>
+<p class="small">XP dan skor disimpan di browser. Bukan token, saldo, atau reward on-chain.</p>
+</section>
+
+<p class="small">Squeekchain Mailroom V3 · Data hardware bersumber dari public status API. Jika data tidak tersedia, game menggunakan Practice Mode.</p>
+</main>
+
+<script>
+const API="https://api.squeekchain.com/v1/status";
+const $=id=>document.getElementById(id);
+
+let score=0,combo=0,lives=3,correct=0,xp=0;
+let current=null,level=1;
+let hardware=false,rpm=0,distance=0;
+let previousRPM=null,startDistance=null;
+let distanceMilestone=0;
+let specialCount=0;
+let lastUpdate=null;
+
+const items=[
+ {emoji:"🍎",type:"FOOD",name:"Fresh Apple"},
+ {emoji:"🍌",type:"FOOD",name:"Banana Box"},
+ {emoji:"🥕",type:"FOOD",name:"Carrot Pack"},
+ {emoji:"🔨",type:"TOOLS",name:"Hammer"},
+ {emoji:"🔧",type:"TOOLS",name:"Wrench"},
+ {emoji:"🪛",type:"TOOLS",name:"Screwdriver"},
+ {emoji:"🧸",type:"TOYS",name:"Teddy Bear"},
+ {emoji:"🚗",type:"TOYS",name:"Toy Car"},
+ {emoji:"⚽",type:"TOYS",name:"Football"}
+];
+
+function updateUI(){
+ $("score").textContent=score;
+ $("combo").textContent=combo;
+ $("lives").textContent=lives;
+ $("level").textContent=level;
+ $("xp").textContent=xp;
+ $("mission").textContent=correct+" / 20 paket benar";
+ $("bar").style.width=Math.min(100,correct/20*100)+"%";
+}
+
+function newPackage(){
+ current=items[Math.floor(Math.random()*items.length)];
+ $("package").textContent=current.emoji;
+ $("destination").textContent=current.name;
+}
+
+function sort(type){
+ if(!current || lives<=0)return;
+ if(type===current.type){
+  score+=10+Math.min(combo,10)*2;
+  combo++;
+  correct++;
+  xp+=1;
+  if(correct%5===0){
+   level++;
+   $("message").textContent="LEVEL UP! Level "+level+" 🎉";
+  }else{
+   $("message").textContent="Benar! Paket terkirim ✅";
+  }
+  if(correct===20){
+   xp+=20;
+   $("message").textContent="DAILY MISSION SELESAI! +20 XP lokal ⭐";
+  }
+ }else{
+  lives--;
+  combo=0;
+  $("message").textContent="Salah tujuan! Coba lebih teliti.";
+ }
+ updateUI();
+ if(lives<=0){
+  $("message").textContent="Game selesai! Tekan Restart Game.";
+  current=null;
+  return;
+ }
+ newPackage();
+}
+
+function newGame(){
+ score=0;combo=0;lives=3;correct=0;level=1;
+ $("message").textContent="Game baru dimulai!";
+ updateUI();newPackage();
+}
+
+function special(message){
+ specialCount++;
+ $("special").textContent="🎁 "+message+" · Paket spesial #"+specialCount;
+ xp+=5;
+ $("xp").textContent=xp;
+ $("message").textContent="SPECIAL DELIVERY! +5 XP lokal 🎉";
+}
+
+async function readHardware(){
+ try{
+  const response=await fetch(API,{cache:"no-store"});
+  if(!response.ok)throw new Error("HTTP "+response.status);
+  const data=await response.json();
+  const m=data.measurement||{};
+  const observed=Date.parse(m.observedAt||"");
+  const fresh=Number.isFinite(observed)&&
+    Date.now()-observed>=0&&Date.now()-observed<120000;
+  const valid=m.provenance==="hardware"&&
+    m.freshness==="online"&&fresh&&
+    Number.isFinite(Number(m.rpmMilli))&&
+    Number.isFinite(Number(m.distanceMm));
+
+  if(!valid)throw new Error("Hardware data stale or unavailable");
+
+  rpm=Number(m.rpmMilli)/1000;
+  distance=Number(m.distanceMm)/1000;
+  hardware=true;
+
+  $("hardware").textContent="● LIVE HARDWARE";
+  $("hardware").className="status green";
+  $("rpm").textContent=rpm.toFixed(1);
+  $("distance").textContent=distance.toFixed(2)+" km";
+  $("mode").textContent="LIVE";
+  $("updated").textContent="Hardware updated: "+new Date(observed).toLocaleTimeString();
+
+  if(startDistance===null){
+   startDistance=distance;
+   previousRPM=rpm;
+  }else{
+   const sessionDistance=Math.max(0,distance-startDistance);
+   const newMilestone=Math.floor(sessionDistance);
+   if(newMilestone>distanceMilestone){
+    distanceMilestone=newMilestone;
+    special("Distance milestone "+newMilestone+" km sesi!");
+   }
+
+   if(previousRPM<90&&rpm>=90){
+    special("Speed milestone 90 RPM!");
+   }else if(previousRPM<120&&rpm>=120){
+    special("Speed milestone 120 RPM!");
+   }
+   previousRPM=rpm;
+  }
+ }catch(error){
+  hardware=false;
+  $("hardware").textContent="● PRACTICE MODE";
+  $("hardware").className="status yellow";
+  $("mode").textContent="PRACTICE";
+  $("updated").textContent="Hardware belum tersedia: "+error.message;
+  $("rpm").textContent="--";
+  $("distance").textContent="--";
+ }
+}
+
+newGame();
+readHardware();
+setInterval(readHardware,5000);
+</script>
+</body>
+</html>
