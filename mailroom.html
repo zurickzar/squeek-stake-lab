@@ -4,78 +4,88 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Squeek Mailroom</title>
+<title>Squeek Mailroom V2</title>
 <style>
 :root {
-  --bg:#101522; --panel:#1b2435; --text:#f4f6fb;
-  --muted:#9ca9bd; --gold:#ffc857; --green:#55d99a;
+  --bg:#101522;--panel:#1b2638;--gold:#ffc857;
+  --text:#f4f6fb;--muted:#9ca9bd;--green:#55d99a;
 }
-* { box-sizing:border-box; }
-body {
-  margin:0; padding:20px 14px 35px;
-  background:radial-gradient(circle at top,#263650,#101522 65%);
-  color:var(--text); font-family:system-ui,sans-serif;
+*{box-sizing:border-box}
+body{
+  margin:0;padding:18px 13px 35px;
+  background:radial-gradient(circle at top,#2a3c55,#101522 65%);
+  color:var(--text);font-family:system-ui,sans-serif
 }
-main { max-width:520px; margin:auto; }
-header { text-align:center; margin:10px 0 20px; }
-h1 { font-size:30px; margin:5px 0; }
-header p { color:var(--muted); margin:4px; }
-.panel {
-  background:var(--panel); border:1px solid #344258;
-  border-radius:16px; padding:15px; margin-bottom:14px;
+main{max-width:540px;margin:auto}
+header{text-align:center;margin:8px 0 18px}
+h1{font-size:29px;margin:4px}
+header p{color:var(--muted);margin:4px}
+.panel{
+  background:var(--panel);border:1px solid #35465e;
+  border-radius:16px;padding:14px;margin-bottom:13px
 }
-.status { display:flex; justify-content:space-between; gap:8px; }
-.pill {
-  border-radius:20px; padding:6px 10px; font-size:12px;
-  background:#39445a; color:white;
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pill{padding:6px 10px;border-radius:20px;font-size:11px;background:#39465b}
+.live{background:#174d3c;color:#8cf5c0}
+.practice{background:#57421d;color:#ffdb88}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:#111b2a;border-radius:11px;padding:10px 4px;text-align:center}
+.stat strong{display:block;font-size:21px}
+.stat small{font-size:10px;color:var(--muted)}
+.note{font-size:12px;color:var(--muted);line-height:1.5}
+.levelbar,.missionbar{height:8px;background:#101522;border-radius:20px;overflow:hidden;margin-top:8px}
+.levelbar div,.missionbar div{height:100%;width:0;background:var(--gold);transition:width .2s}
+.arena{
+  height:250px;position:relative;overflow:hidden;
+  border:2px solid #465a76;border-radius:15px;
+  background:linear-gradient(#263a52,#172337);
 }
-.live { background:#174d3c; color:#8cf5c0; }
-.practice { background:#57421d; color:#ffdb88; }
-.stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
-.stat { background:#111a29; border-radius:12px; padding:10px 5px; text-align:center; }
-.stat strong { display:block; font-size:21px; }
-.stat small { color:var(--muted); font-size:11px; }
-.arena {
-  min-height:270px; position:relative; overflow:hidden;
-  background:linear-gradient(180deg,#26364c,#172235);
-  border:2px solid #40516b; border-radius:16px;
-  display:flex; flex-direction:column; align-items:center;
-  justify-content:space-between; padding:18px 10px;
+.belt{
+  position:absolute;left:0;right:0;bottom:55px;height:18px;
+  background:repeating-linear-gradient(90deg,#71849c 0 18px,#35475f 18px 36px);
+  animation:beltrun .6s linear infinite;
 }
-.belt {
-  position:absolute; left:0; right:0; top:48%;
-  height:8px; background:repeating-linear-gradient(
-    90deg,#71849c 0 18px,#34445b 18px 30px);
-  opacity:.7;
+@keyframes beltrun{to{background-position:-36px 0}}
+.lane{
+  position:absolute;left:0;right:0;bottom:73px;
+  height:3px;background:#8295ad
 }
-.package {
-  z-index:2; font-size:64px; margin-top:20px;
-  filter:drop-shadow(0 5px 4px #0008);
+.package{
+  position:absolute;left:0;top:72px;width:100%;
+  text-align:center;font-size:59px;
+  transform:translateX(0);filter:drop-shadow(0 5px 4px #0008);
 }
-.instruction { z-index:2; color:#dce6f5; text-align:center; font-size:14px; }
-.timer {
-  z-index:2; width:100%; height:7px; background:#101522;
-  border-radius:10px; overflow:hidden;
+.package.moving{will-change:transform}
+.arena-label{
+  position:absolute;top:17px;left:8px;right:8px;
+  text-align:center;font-weight:800;font-size:13px
 }
-#timebar { height:100%; width:100%; background:var(--gold); }
-.buttons { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
-.bin {
-  border:1px solid #52647d; border-radius:13px;
-  background:#26364c; color:white; padding:14px 4px;
-  font-size:14px; font-weight:700; min-height:76px;
-  cursor:pointer;
+.finish{
+  position:absolute;right:12px;top:70px;
+  height:85px;width:4px;background:#ff7777;
+  box-shadow:0 0 10px #ff7777
 }
-.bin:active { transform:scale(.96); background:#405575; }
-.bin span { display:block; font-size:24px; margin-bottom:4px; }
-button:disabled { opacity:.5; cursor:not-allowed; }
-.action {
-  width:100%; border:0; border-radius:12px; padding:14px;
-  font-size:16px; font-weight:800; cursor:pointer;
-  background:var(--gold); color:#20202a;
+.finish:after{content:"SORT";position:absolute;top:-20px;right:-12px;font-size:10px}
+.arena-bottom{
+  position:absolute;bottom:12px;left:8px;right:8px;
+  text-align:center;font-size:12px;color:#dce6f5
 }
-.note { color:var(--muted); font-size:12px; line-height:1.5; }
-#message { text-align:center; color:var(--gold); min-height:24px; margin:10px 0; }
-footer { text-align:center; color:var(--muted); font-size:11px; margin-top:18px; }
+.buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.bin{
+  min-height:76px;border:1px solid #526780;border-radius:12px;
+  background:#293b53;color:white;font-weight:800;
+  font-size:13px;cursor:pointer
+}
+.bin span{display:block;font-size:25px;margin-bottom:3px}
+.bin:active{transform:scale(.96);background:#405b7a}
+button:disabled{opacity:.45;cursor:not-allowed}
+.action{
+  width:100%;padding:14px;border:0;border-radius:12px;
+  background:var(--gold);color:#20202a;font-size:16px;
+  font-weight:900;cursor:pointer
+}
+#message{min-height:24px;text-align:center;color:var(--gold);font-size:13px;margin:10px 0}
+footer{text-align:center;color:var(--muted);font-size:11px;margin-top:18px}
 </style>
 </head>
 <body>
@@ -83,39 +93,45 @@ footer { text-align:center; color:var(--muted); font-size:11px; margin-top:18px;
 <header>
   <div style="font-size:42px">🐹📦</div>
   <h1>SQUEEK MAILROOM</h1>
-  <p>Sort fast. Keep the hamster economy moving!</p>
+  <p>Real wheel. Real speed. Your sorting challenge.</p>
+  <span class="pill">VERSION 2.0</span>
 </header>
 
 <section class="panel">
-  <div class="status">
+  <div class="row">
     <span id="mode" class="pill practice">PRACTICE MODE</span>
     <span id="connection" class="pill">Checking API...</span>
   </div>
   <div class="stats" style="margin-top:12px">
     <div class="stat"><strong id="rpm">--</strong><small>HAMSTER RPM</small></div>
-    <div class="stat"><strong id="speed">--</strong><small>WHEEL SPEED</small></div>
-    <div class="stat"><strong id="distance">--</strong><small>DISTANCE (KM)</small></div>
+    <div class="stat"><strong id="speed">--</strong><small>SPEED M/S</small></div>
+    <div class="stat"><strong id="distance">--</strong><small>DISTANCE KM</small></div>
   </div>
-  <p class="note" id="source">Waiting for wheel telemetry...</p>
+  <p class="note" id="source">Reading wheel telemetry...</p>
 </section>
 
 <section class="panel">
   <div class="stats">
     <div class="stat"><strong id="score">0</strong><small>SCORE</small></div>
-    <div class="stat"><strong id="combo">0</strong><small>COMBO</small></div>
+    <div class="stat"><strong id="level">1</strong><small>LEVEL</small></div>
     <div class="stat"><strong id="lives">❤️❤️❤️</strong><small>LIVES</small></div>
   </div>
+  <div class="row" style="margin-top:12px">
+    <small>Level progress</small><small id="levelText">0 / 5 correct</small>
+  </div>
+  <div class="levelbar"><div id="levelProgress"></div></div>
 </section>
 
 <section class="panel">
   <div class="arena">
-    <div class="instruction" id="round">READY FOR DUTY?</div>
-    <div class="belt"></div>
+    <div class="arena-label" id="round">MAILROOM READY</div>
+    <div class="finish"></div>
     <div class="package" id="package">📦</div>
-    <div class="instruction" id="hint">Press START to sort your first package.</div>
-    <div class="timer"><div id="timebar"></div></div>
+    <div class="lane"></div>
+    <div class="belt"></div>
+    <div class="arena-bottom" id="hint">Press START to begin your shift</div>
   </div>
-  <div id="message">Three destinations. One busy mailroom.</div>
+  <div id="message">Sort the package before it reaches the end!</div>
   <div class="buttons">
     <button class="bin" data-bin="food" disabled><span>🥕</span>FOOD</button>
     <button class="bin" data-bin="tools" disabled><span>🔧</span>TOOLS</button>
@@ -127,231 +143,276 @@ footer { text-align:center; color:var(--muted); font-size:11px; margin-top:18px;
 </section>
 
 <section class="panel">
-  <strong>🏆 Your Record</strong>
-  <p style="margin-bottom:0">Best score: <strong id="best">0</strong></p>
-  <p class="note">Your record is saved locally on this device.</p>
+  <div class="row">
+    <strong>📅 Daily Mission</strong>
+    <span class="pill" id="missionStatus">IN PROGRESS</span>
+  </div>
+  <p class="note">Sort 20 packages correctly today to earn 20 local XP.</p>
+  <div class="row">
+    <small id="missionCount">0 / 20 packages</small>
+    <strong id="xp">0 XP</strong>
+  </div>
+  <div class="missionbar"><div id="missionProgress"></div></div>
+  <p class="note" id="missionNote">Your mission progress is saved on this device.</p>
+</section>
+
+<section class="panel">
+  <div class="row"><strong>🏆 Personal Record</strong><strong id="best">0</strong></div>
+  <p class="note">Best score saved locally on this device.</p>
 </section>
 
 <section class="panel">
   <strong>How to play</strong>
   <p class="note">
-    1. Look at the package emoji.<br>
-    2. Choose the correct destination.<br>
-    3. Sort before the timer runs out.<br>
-    4. Build combos and beat your record!
+    🥕 Food goes to FOOD.<br>
+    🔧 Tools go to TOOLS.<br>
+    🎾 Toys go to TOYS.<br>
+    Correct sorting builds score and levels. Wrong sorting costs a life.
+    The conveyor speed follows fresh hardware RPM when available.
   </p>
   <p class="note">
-    Live mode uses fresh hardware telemetry. If the API is unavailable
-    or its data is stale, the game switches to Practice Mode.
+    XP and records are local game progress only. They are not tokens,
+    blockchain rewards, or a promise of Genesis approval.
   </p>
 </section>
-<footer>SQUEEK MAILROOM · COMMUNITY GAME · V1</footer>
+<footer>SQUEEK MAILROOM V2 · COMMUNITY GAME</footer>
 </main>
 
 <script>
-const API = "https://api.squeekchain.com/v1/status";
+"use strict";
 
-let liveRPM = null;
-let liveDistance = null;
-let liveHardware = false;
-let playing = false;
-let score = 0;
-let combo = 0;
-let lives = 3;
-let current = null;
-let deadline = 0;
-let frame = null;
-let best = Number(localStorage.getItem("mailroomBest") || 0);
-
-const $ = id => document.getElementById(id);
-$("best").textContent = best;
-
-const packages = [
-  { emoji:"🥕", bin:"food", name:"Carrot Box" },
-  { emoji:"🍎", bin:"food", name:"Apple Box" },
-  { emoji:"🥜", bin:"food", name:"Peanut Box" },
-  { emoji:"🔧", bin:"tools", name:"Tool Box" },
-  { emoji:"⚙️", bin:"tools", name:"Gear Box" },
-  { emoji:"🪛", bin:"tools", name:"Repair Kit" },
-  { emoji:"🎾", bin:"toys", name:"Ball Box" },
-  { emoji:"🧸", bin:"toys", name:"Toy Box" },
-  { emoji:"🪀", bin:"toys", name:"Play Box" }
+const API="https://api.squeekchain.com/v1/status";
+const DAILY_GOAL=20;
+const STORAGE_KEY="squeekMailroomV2";
+const packages=[
+ {emoji:"🥕",bin:"food",name:"Carrot Box"},
+ {emoji:"🍎",bin:"food",name:"Apple Box"},
+ {emoji:"🥜",bin:"food",name:"Peanut Box"},
+ {emoji:"🔧",bin:"tools",name:"Tool Box"},
+ {emoji:"⚙️",bin:"tools",name:"Gear Box"},
+ {emoji:"🪛",bin:"tools",name:"Repair Kit"},
+ {emoji:"🎾",bin:"toys",name:"Ball Box"},
+ {emoji:"🧸",bin:"toys",name:"Toy Box"},
+ {emoji:"🪀",bin:"toys",name:"Play Box"}
 ];
 
-function updateMode() {
-  const fresh = liveHardware &&
-    Date.now() - (window.lastObserved || 0) < 120000;
+const $=id=>document.getElementById(id);
+let playing=false,score=0,level=1,lives=3,correctInLevel=0;
+let current=null,raf=null,packageStart=0,packageDuration=0;
+let liveHardware=false,liveRPM=0,lastObserved=0;
+let best=Number(localStorage.getItem("mailroomBestV2")||0);
 
-  $("mode").textContent = fresh ? "LIVE HARDWARE" : "PRACTICE MODE";
-  $("mode").className = "pill " + (fresh ? "live" : "practice");
-  $("connection").textContent = fresh ? "API ONLINE" : "SIMULATED";
-  $("source").textContent = fresh
-    ? "Real wheel telemetry connected · Hardware verified"
-    : "Hardware data unavailable or stale · Practice speed active";
+function todayKey(){
+ return new Date().toLocaleDateString("en-CA");
 }
 
-async function loadTelemetry() {
-  try {
-    const response = await fetch(API, { cache:"no-store" });
-    if (!response.ok) throw new Error("API response " + response.status);
-    const data = await response.json();
-    const m = data.measurement;
-
-    if (!m || m.provenance !== "hardware" ||
-        m.freshness !== "online" || !m.observedAt ||
-        !Number.isFinite(Number(m.rpmMilli)) ||
-        !Number.isFinite(Number(m.distanceMm))) {
-      throw new Error("No fresh hardware measurement");
-    }
-
-    const observed = Date.parse(m.observedAt);
-    if (!Number.isFinite(observed) ||
-        Date.now() - observed > 120000 ||
-        observed > Date.now() + 10000) {
-      throw new Error("Stale measurement");
-    }
-
-    liveRPM = Number(m.rpmMilli) / 1000;
-    liveDistance = Number(m.distanceMm) / 1000000;
-    liveHardware = true;
-    window.lastObserved = observed;
-
-    $("rpm").textContent = liveRPM.toFixed(1);
-    $("speed").textContent =
-      (Number(m.speedMmPerSecond) / 1000).toFixed(2);
-    $("distance").textContent = liveDistance.toFixed(2);
-  } catch (error) {
-    liveHardware = false;
-    $("rpm").textContent = "--";
-    $("speed").textContent = "--";
-    $("distance").textContent = "--";
+function loadSaved(){
+ try{
+  const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}");
+  if(saved.date===todayKey()){
+   return {
+    count:Number(saved.count)||0,
+    xp:Number(saved.xp)||0,
+    claimed:!!saved.claimed
+   };
   }
-  updateMode();
+ }catch(e){}
+ return {count:0,xp:0,claimed:false};
+}
+let daily=loadSaved();
+
+function saveDaily(){
+ localStorage.setItem(STORAGE_KEY,JSON.stringify({
+  date:todayKey(),count:daily.count,xp:daily.xp,claimed:daily.claimed
+ }));
+ renderDaily();
 }
 
-function packageDuration() {
-  const rpm = liveHardware ? liveRPM : 30;
-  return Math.max(1800, Math.min(6500, 6500 - rpm * 55));
+function renderDaily(){
+ $("missionCount").textContent=Math.min(daily.count,DAILY_GOAL)+" / "+DAILY_GOAL+" packages";
+ $("xp").textContent=daily.xp+" XP";
+ $("missionProgress").style.width=Math.min(100,daily.count/DAILY_GOAL*100)+"%";
+ $("missionStatus").textContent=daily.claimed?"COMPLETED":"IN PROGRESS";
+ $("missionNote").textContent=daily.claimed
+  ?"Mission complete! 20 local XP earned."
+  :"Progress is saved on this device.";
 }
 
-function nextPackage() {
-  if (!playing) return;
-  current = packages[Math.floor(Math.random() * packages.length)];
-  $("package").textContent = current.emoji;
-  $("round").textContent = "SORT THIS PACKAGE!";
-  $("hint").textContent = current.name;
-  $("message").textContent = "Choose the correct destination!";
-  deadline = Date.now() + packageDuration();
-  document.querySelectorAll(".bin").forEach(b => b.disabled = false);
-  if (frame) cancelAnimationFrame(frame);
-  tick();
+function renderStats(){
+ $("score").textContent=score;
+ $("level").textContent=level;
+ $("lives").textContent="❤️".repeat(lives)+"🖤".repeat(3-lives);
+ $("levelText").textContent=correctInLevel+" / 5 correct";
+ $("levelProgress").style.width=(correctInLevel/5*100)+"%";
 }
 
-function tick() {
-  if (!playing) return;
-  const remaining = Math.max(0, deadline - Date.now());
-  const duration = packageDuration();
-  $("timebar").style.width = (remaining / duration * 100) + "%";
+function updateMode(){
+ const fresh=liveHardware && Date.now()-lastObserved<120000;
+ $("mode").textContent=fresh?"LIVE HARDWARE":"PRACTICE MODE";
+ $("mode").className="pill "+(fresh?"live":"practice");
+ $("connection").textContent=fresh?"API ONLINE":"SIMULATED";
+ $("source").textContent=fresh
+  ?"Fresh hardware telemetry verified."
+  :"Hardware unavailable or stale. Practice speed active.";
+}
 
-  if (remaining <= 0) {
-    missPackage();
-    return;
+async function loadTelemetry(){
+ try{
+  const response=await fetch(API,{cache:"no-store"});
+  if(!response.ok)throw Error("API "+response.status);
+  const data=await response.json();
+  const m=data.measurement;
+  if(!m||m.provenance!=="hardware"||m.freshness!=="online"||
+    !Number.isFinite(Number(m.rpmMilli))||
+    !Number.isFinite(Number(m.distanceMm))||
+    !m.observedAt)throw Error("No valid hardware data");
+
+  const observed=Date.parse(m.observedAt);
+  if(!Number.isFinite(observed)||Date.now()-observed>120000||
+    observed>Date.now()+10000)throw Error("Stale telemetry");
+
+  liveRPM=Number(m.rpmMilli)/1000;
+  lastObserved=observed;
+  liveHardware=true;
+  $("rpm").textContent=liveRPM.toFixed(1);
+  $("speed").textContent=(Number(m.speedMmPerSecond)/1000).toFixed(2);
+  $("distance").textContent=(Number(m.distanceMm)/1000000).toFixed(2);
+ }catch(e){
+  liveHardware=false;
+  $("rpm").textContent="--";
+  $("speed").textContent="--";
+  $("distance").textContent="--";
+ }
+ updateMode();
+}
+
+function getDuration(){
+ const rpm=liveHardware&&Date.now()-lastObserved<120000?liveRPM:30;
+ const hardwareTime=6500-rpm*55;
+ const levelPenalty=(level-1)*250;
+ return Math.max(1400,Math.min(7000,hardwareTime-levelPenalty));
+}
+
+function nextPackage(){
+ if(!playing)return;
+ current=packages[Math.floor(Math.random()*packages.length)];
+ $("package").textContent=current.emoji;
+ $("package").style.transform="translateX(-100%)";
+ $("package").classList.add("moving");
+ $("round").textContent="LEVEL "+level+" · SORT THE PACKAGE";
+ $("hint").textContent=current.name+" — choose a destination";
+ $("message").textContent="Package incoming!";
+ document.querySelectorAll(".bin").forEach(b=>b.disabled=false);
+ packageStart=performance.now();
+ packageDuration=getDuration();
+ if(raf)cancelAnimationFrame(raf);
+ animatePackage();
+}
+
+function animatePackage(now){
+ if(!playing||!current)return;
+ const elapsed=now-packageStart;
+ const progress=Math.min(1,elapsed/packageDuration);
+ const width=$("package").parentElement.clientWidth;
+ const x=-width+(width+width*.55)*progress;
+ $("package").style.transform="translateX("+x+"px)";
+ if(progress>=1){
+  missPackage();
+  return;
+ }
+ raf=requestAnimationFrame(animatePackage);
+}
+
+function stopAnimation(){
+ if(raf!==null)cancelAnimationFrame(raf);
+ raf=null;
+}
+
+function sort(bin){
+ if(!playing||!current)return;
+ stopAnimation();
+ document.querySelectorAll(".bin").forEach(b=>b.disabled=true);
+ if(bin===current.bin){
+  correctInLevel++;
+  const points=10+Math.min(level,10)*2;
+  score+=points;
+  daily.count++;
+  $("message").textContent="Correct! +"+points+" points";
+  $("package").textContent="✅";
+
+  if(!daily.claimed&&daily.count>=DAILY_GOAL){
+   daily.claimed=true;
+   daily.xp=20;
+   $("message").textContent="🎉 Daily Mission complete! +20 local XP";
   }
-  frame = requestAnimationFrame(tick);
-}
+  saveDaily();
 
-function missPackage() {
-  if (!playing) return;
+  if(correctInLevel>=5){
+   correctInLevel=0;
+   level++;
+   $("message").textContent="🚀 LEVEL UP! Welcome to Level "+level;
+  }
+ }else{
   lives--;
-  combo = 0;
-  updateStats();
-  $("message").textContent = "Package missed! Watch the timer.";
-  $("package").textContent = "💥";
-  document.querySelectorAll(".bin").forEach(b => b.disabled = true);
-
-  if (lives <= 0) {
-    endGame();
-  } else {
-    setTimeout(nextPackage, 650);
-  }
+  correctInLevel=0;
+  $("message").textContent="Wrong destination! One life lost.";
+  $("package").textContent="❌";
+ }
+ renderStats();
+ if(lives<=0){endGame();return;}
+ setTimeout(nextPackage,650);
 }
 
-function sort(bin) {
-  if (!playing || !current) return;
-  if (frame) cancelAnimationFrame(frame);
-
-  document.querySelectorAll(".bin").forEach(b => b.disabled = true);
-
-  if (bin === current.bin) {
-    combo++;
-    score += 10 + Math.min(combo, 10) * 2;
-    $("message").textContent = combo >= 3
-      ? "🔥 Perfect combo! +" + (10 + Math.min(combo,10)*2)
-      : "Correct sort! Nice work!";
-    $("package").textContent = "✅";
-  } else {
-    lives--;
-    combo = 0;
-    $("message").textContent = "Wrong destination! Try again.";
-    $("package").textContent = "❌";
-  }
-
-  updateStats();
-
-  if (lives <= 0) {
-    endGame();
-  } else {
-    setTimeout(nextPackage, 650);
-  }
+function missPackage(){
+ if(!playing)return;
+ stopAnimation();
+ lives--;
+ correctInLevel=0;
+ $("package").textContent="💥";
+ $("message").textContent="Package missed! One life lost.";
+ document.querySelectorAll(".bin").forEach(b=>b.disabled=true);
+ renderStats();
+ if(lives<=0){endGame();return;}
+ setTimeout(nextPackage,650);
 }
 
-function updateStats() {
-  $("score").textContent = score;
-  $("combo").textContent = combo;
-  $("lives").textContent = "❤️".repeat(lives) + "🖤".repeat(3-lives);
+function startGame(){
+ if(playing)return;
+ score=0;level=1;lives=3;correctInLevel=0;playing=true;
+ renderStats();
+ $("start").disabled=true;
+ $("start").textContent="SHIFT IN PROGRESS";
+ nextPackage();
 }
 
-function startGame() {
-  if (playing) return;
-  score = 0;
-  combo = 0;
-  lives = 3;
-  playing = true;
-  updateStats();
-  $("start").textContent = "GAME RUNNING";
-  $("start").disabled = true;
-  nextPackage();
+function endGame(){
+ playing=false;
+ current=null;
+ stopAnimation();
+ document.querySelectorAll(".bin").forEach(b=>b.disabled=true);
+ $("package").textContent="🐹";
+ $("round").textContent="SHIFT COMPLETE";
+ $("hint").textContent="Final score: "+score;
+ $("message").textContent="Great work, mailroom operator!";
+ $("start").disabled=false;
+ $("start").textContent="PLAY AGAIN";
+ if(score>best){
+  best=score;
+  localStorage.setItem("mailroomBestV2",String(best));
+  $("best").textContent=best;
+ }
 }
 
-function endGame() {
-  playing = false;
-  current = null;
-  if (frame) cancelAnimationFrame(frame);
-  document.querySelectorAll(".bin").forEach(b => b.disabled = true);
-  $("package").textContent = "🐹";
-  $("round").textContent = "SHIFT COMPLETE!";
-  $("hint").textContent = "Your final score: " + score;
-  $("timebar").style.width = "0%";
-  $("message").textContent = "Mailroom closed. Great effort!";
-
-  if (score > best) {
-    best = score;
-    localStorage.setItem("mailroomBest", best);
-    $("best").textContent = best;
-  }
-
-  $("start").disabled = false;
-  $("start").textContent = "PLAY AGAIN";
-}
-
-document.querySelectorAll(".bin").forEach(button => {
-  button.addEventListener("click", () => sort(button.dataset.bin));
+document.querySelectorAll(".bin").forEach(button=>{
+ button.addEventListener("click",()=>sort(button.dataset.bin));
 });
+$("start").addEventListener("click",startGame);
 
-$("start").addEventListener("click", startGame);
-
+$("best").textContent=best;
+renderStats();
+renderDaily();
 loadTelemetry();
-setInterval(loadTelemetry, 5000);
+setInterval(loadTelemetry,5000);
 </script>
 </body>
 </html>
