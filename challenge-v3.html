@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Squeek Challenge Lab V3</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b1020;color:#edf2ff;font-family:Arial,sans-serif}
+header{padding:25px 18px;background:linear-gradient(135deg,#172554,#312e81)}
+h1{margin:0 0 8px;color:#facc15}
+header p{color:#cbd5e1;margin:0}
+nav{display:flex;gap:7px;overflow-x:auto;padding:12px;background:#111827;position:sticky;top:0}
+nav button{white-space:nowrap}
+button{border:0;border-radius:9px;padding:11px 14px;background:#334155;color:white;font-weight:bold;cursor:pointer}
+button.active,button.primary{background:#2563eb}
+main{max-width:850px;margin:auto;padding:16px}
+.panel{background:#172033;border:1px solid #29364d;border-radius:14px;padding:17px;margin:13px 0}
+h2{color:#93c5fd;margin-top:0}
+h3{color:#facc15}
+.muted{color:#aab7cc;font-size:14px}
+.stat{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.stat div{background:#202d43;padding:14px;border-radius:10px}
+.big{font-size:25px;font-weight:bold;color:#facc15}
+.bar{height:10px;background:#334155;border-radius:10px;overflow:hidden;margin:10px 0}
+.bar span{display:block;height:100%;background:#22c55e;width:0}
+.option{display:block;width:100%;text-align:left;margin:8px 0;background:#26364f}
+.option:hover{background:#36527a}
+.result{padding:12px;border-radius:9px;margin-top:12px;background:#26364f}
+.badge{display:inline-block;padding:7px 10px;margin:5px;border-radius:20px;background:#334155;color:#facc15}
+.locked{opacity:.4}
+footer{text-align:center;color:#64748b;padding:25px;font-size:12px}
+</style>
+</head>
+<body>
+<header>
+<h1>⚡ SQUEEK CHALLENGE LAB V3</h1>
+<p>Learn blockchain safety. Earn XP. Unlock achievements.</p>
+</header>
+<nav id="nav">
+<button class="active" onclick="show('home',this)">Home</button>
+<button onclick="show('daily',this)">Daily</button>
+<button onclick="show('challenges',this)">Challenges</button>
+<button onclick="show('achievements',this)">Badges</button>
+<button onclick="show('leaderboard',this)">Leaderboard</button>
+</nav>
+<main id="app"></main>
+<footer>Squeek Challenge Lab V3 · Educational simulation only · No wallet connection</footer>
+<script>
+const KEY="squeekChallengeV3";
+const defaults={xp:0,done:[],daily:"",dailyDone:false};
+let data;
+try{data={...defaults,...JSON.parse(localStorage.getItem(KEY)||"{}")}}
+catch(e){data={...defaults}}
+function save(){localStorage.setItem(KEY,JSON.stringify(data))}
+function level(){return Math.floor(data.xp/100)+1}
+function addXP(id,points){
+if(data.done.includes(id))return false;
+data.done.push(id);data.xp+=points;save();return true;
+}
+const questions=[
+{q:"Apa yang wajib dirahasiakan dari siapa pun?",a:["Seed phrase","Alamat wallet","Tx hash"],correct:0,why:"Seed phrase memberikan kendali atas wallet."},
+{q:"Situs mint meminta unlimited approval. Apa tindakan aman?",a:["Langsung setuju","Tolak dan periksa kontrak","Bagikan seed phrase"],correct:1,why:"Unlimited approval dapat memberi akses token berlebihan."},
+{q:"Ada pesan hadiah gratis meminta private key. Apa yang dilakukan?",a:["Kirim segera","Abaikan dan laporkan","Coba dengan wallet utama"],correct:1,why:"Hadiah yang meminta private key adalah tanda penipuan."},
+{q:"Sebelum transaksi blockchain, apa yang harus dicek?",a:["Nama influencer","Alamat kontrak dan simulasi transaksi","Jumlah followers"],correct:1,why:"Periksa tujuan, nilai, izin, dan simulasi transaksi."},
+{q:"Apa fungsi hardware wallet?",a:["Menambah followers","Membantu menjaga private key","Menjamin profit"],correct:1,why:"Hardware wallet membantu menyimpan kunci secara offline."},
+{q:"Website meminta koneksi wallet untuk membaca artikel. Apa sikap aman?",a:["Waspada, cek kebutuhan dan domain","Langsung tanda tangan","Masukkan seed phrase"],correct:0,why:"Koneksi wallet tidak diperlukan untuk sekadar membaca artikel."},
+{q:"Apa arti transaksi yang meminta tanda tangan tidak jelas?",a:["Pasti aman","Harus ditolak sampai dipahami","Pasti gratis"],correct:1,why:"Jangan menandatangani pesan atau transaksi yang tidak dipahami."}
+];
+const dailyIndex=()=>{
+let n=new Date();return Math.floor((Date.UTC(n.getFullYear(),n.getMonth(),n.getDate())/86400000)%questions.length);
+};
+function show(page,btn){
+document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+if(btn)btn.classList.add("active");
+if(page==="home")home();
+if(page==="daily")daily();
+if(page==="challenges")challenges();
+if(page==="achievements")achievements();
+if(page==="leaderboard")leaderboard();
+}
+function home(){
+let pct=data.xp%100;
+document.getElementById("app").innerHTML=`
+<div class="panel"><h2>Welcome, Builder! 👋</h2>
+<p class="muted">Belajar keamanan Web3 melalui latihan interaktif.</p>
+<div class="stat">
+<div><div class="muted">Total XP</div><div class="big">${data.xp}</div></div>
+<div><div class="muted">Level</div><div class="big">${level()}</div></div>
+<div><div class="muted">Challenges selesai</div><div class="big">${data.done.length}</div></div>
+<div><div class="muted">Badges unlocked</div><div class="big">${badgeCount()}</div></div>
+</div>
+<h3>Level ${level()} progress</h3>
+<div class="bar"><span style="width:${pct}%"></span></div>
+<p class="muted">${pct}/100 XP menuju level berikutnya.</p>
+</div>
+<div class="panel"><h2>🎯 Your next step</h2>
+<p>Selesaikan Daily Challenge untuk mendapatkan 20 XP pertama kali setiap hari.</p>
+<button class="primary" onclick="daily()">Mulai Daily Challenge</button></div>`;
+}
+function renderQuestion(q,id,points,done){
+let app=document.getElementById("app");
+app.innerHTML=`<div class="panel"><h2>${q.q}</h2>
+${q.a.map((a,i)=>`<button class="option" onclick="answer('${id}',${i},${q.correct},${points})">${a}</button>`).join("")}
+<div id="answerResult"></div></div>`;
+if(done)document.getElementById("answerResult").innerHTML='<div class="result">Tantangan ini sudah pernah diselesaikan.</div>';
+}
+function answer(id,choice,correct,points){
+let box=document.getElementById("answerResult");
+if(data.done.includes(id)){box.innerHTML="Tantangan sudah selesai sebelumnya.";return}
+if(choice===correct){
+addXP(id,points);
+box.innerHTML=`<div class="result">✅ Benar! +${points} XP<br>Jawabanmu tepat. XP tersimpan.</div>`;
+}else{
+box.innerHTML='<div class="result">❌ Belum tepat. Pelajari lagi lalu coba tantangan lain.</div>';
+}
+}
+function daily(){
+let i=dailyIndex(),q=questions[i],id="daily-"+new Date().toISOString().slice(0,10);
+document.getElementById("app").innerHTML=`<div class="panel"><h2>🌞 Daily Challenge</h2><p class="muted">Satu latihan baru setiap hari · Hadiah 20 XP.</p></div><div id="dailyQuestion"></div>`;
+renderQuestion(q,id,20,data.done.includes(id));
+}
+function challenges(){
+document.getElementById("app").innerHTML=`<div class="panel"><h2>🧠 Safety Challenges</h2><p class="muted">Setiap jawaban benar pertama kali mendapatkan 10 XP.</p></div>`+
+questions.map((q,i)=>`<div class="panel"><h3>Challenge ${i+1}</h3><p>${q.q}</p><button class="primary" onclick="openChallenge(${i})">${data.done.includes("challenge-"+i)?"Lihat tantangan":"Mulai tantangan"}</button></div>`).join("");
+}
+function openChallenge(i){
+renderQuestion(questions[i],"challenge-"+i,10,data.done.includes("challenge-"+i));
+}
+const badges=[
+{n:"First Steps",d:"Selesaikan 1 challenge",ok:()=>data.done.length>=1},
+{n:"Learner",d:"Kumpulkan 50 XP",ok:()=>data.xp>=50},
+{n:"Builder",d:"Kumpulkan 100 XP",ok:()=>data.xp>=100},
+{n:"Expert",d:"Kumpulkan 300 XP",ok:()=>data.xp>=300},
+{n:"Safety Master",d:"Selesaikan 7 challenge",ok:()=>data.done.filter(x=>x.startsWith("challenge-")).length>=7}
+];
+function badgeCount(){return badges.filter(b=>b.ok()).length}
+function achievements(){
+document.getElementById("app").innerHTML=`<div class="panel"><h2>🏅 Achievements</h2><p class="muted">Kumpulkan XP dan selesaikan latihan untuk membuka badge.</p>${badges.map(b=>`<span class="badge ${b.ok()?"":"locked"}">${b.ok()?"🏅":"🔒"} ${b.n}</span><p class="muted">${b.d} · ${b.ok()?"Unlocked":"Locked"}</p>`).join("")}</div>`;
+}
+function leaderboard(){
+document.getElementById("app").innerHTML=`<div class="panel"><h2>🏆 Leaderboard</h2><p class="muted">Peringkat lokal simulasi, bukan ranking pemain global.</p><div class="result">🥇 You · ${data.xp} XP · Level ${level()}</div><p class="muted">Leaderboard global belum terhubung ke server.</p></div>`;
+}
+home();
+</script>
+</body>
+</html>
