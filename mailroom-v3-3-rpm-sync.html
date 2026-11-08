@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Squeek Mailroom V3.3</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:20px;background:#101827;color:#eef4ff;font-family:Arial,sans-serif}
+main{max-width:650px;margin:auto}
+h1{color:#f5c96a}
+.small{color:#a9bad1;font-size:13px;line-height:1.5}
+.panel{background:#1b293d;border:1px solid #34455e;border-radius:15px;padding:17px;margin:15px 0}
+.status{display:inline-block;padding:8px 12px;border-radius:20px;background:#35445a;font-size:13px}
+.green{color:#8ff0b1}.yellow{color:#ffdc83}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.stat{background:#263750;border-radius:10px;padding:12px;text-align:center;font-size:13px}
+.stat strong{display:block;font-size:22px;margin-top:6px}
+.package{font-size:54px;display:inline-block;animation:bob .7s ease-in-out infinite alternate}
+@keyframes bob{from{transform:translateY(0)}to{transform:translateY(-5px)}}
+.belt{height:13px;background:repeating-linear-gradient(90deg,#526780 0 18px,#263750 18px 36px);border-radius:12px;margin:14px 0;overflow:hidden}
+.belt:after{content:"";display:block;height:100%;width:35%;background:#f2c66d;opacity:.35;animation:beltrun var(--belt-duration,1s) linear infinite}
+@keyframes beltrun{from{transform:translateX(-110%)}to{transform:translateX(300%)}}
+.package-wrap{text-align:center;margin:14px 0}
+.destination{text-align:center;font-size:21px;font-weight:bold}
+.buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+button{border:0;border-radius:10px;padding:14px 8px;font-weight:bold;font-size:15px;background:#f2c66d;color:#172033;cursor:pointer}
+button.secondary{background:#354963;color:white}
+#message{min-height:25px;text-align:center;color:#f5d68b;font-weight:bold}
+.progress{height:10px;background:#354963;border-radius:10px;overflow:hidden}
+#bar{height:100%;width:0;background:#f2c66d}
+.timer-track{height:9px;background:#354963;border-radius:9px;overflow:hidden;margin:12px 0}
+#timerBar{height:100%;width:100%;background:#8ff0b1;transition:width .1s linear}
+@media(max-width:380px){body{padding:12px}.panel{padding:13px}.stat{padding:9px}.stat strong{font-size:19px}button{font-size:13px}}
+@media(prefers-reduced-motion:reduce){.package{animation:none}.belt:after{animation:none}}
+</style>
+</head>
+<body>
+<main>
+<h1>📦 Squeek Mailroom V3.3</h1>
+<p class="small">Live RPM conveyor speed · Sorting challenge · Daily XP</p>
+<section class="panel">
+<div id="hardware" class="status yellow">CONNECTING...</div>
+<div class="stats" style="margin-top:15px">
+<div class="stat">Wheel RPM<strong id="rpm">--</strong></div>
+<div class="stat">Total Distance<strong id="distance">--</strong></div>
+<div class="stat">Game Speed<strong id="speed">PRACTICE</strong></div>
+</div>
+<p class="small" id="updated">Checking hardware...</p>
+<p class="small">Semakin tinggi RPM, semakin cepat conveyor dan semakin singkat waktu sortir.</p>
+</section>
+<section class="panel">
+<div class="stats">
+<div class="stat">Score<strong id="score">0</strong></div>
+<div class="stat">Combo<strong id="combo">0</strong></div>
+<div class="stat">Lives<strong id="lives">3</strong></div>
+</div>
+<div style="text-align:center;margin-top:15px">
+<div class="small">LEVEL</div>
+<strong id="level" style="font-size:30px">1</strong>
+</div>
+<div class="belt"></div>
+<div class="package-wrap"><div class="package" id="package">📦</div></div>
+<div class="destination" id="destination">Paket berikutnya</div>
+<div class="small" style="text-align:center;margin-top:8px">Waktu tersisa: <strong id="timeLeft">--</strong></div>
+<div class="timer-track"><div id="timerBar"></div></div>
+<p class="small" style="text-align:center">Sortir sebelum waktu habis.</p>
+<div class="buttons">
+<button onclick="sort('FOOD')">🍎 FOOD</button>
+<button onclick="sort('TOOLS')">🔧 TOOLS</button>
+<button onclick="sort('TOYS')">🧸 TOYS</button>
+</div>
+<p id="message"></p>
+<button class="secondary" style="width:100%" onclick="newGame()">Restart Game</button>
+</section>
+<section class="panel">
+<h3>⭐ Special Delivery</h3>
+<div id="special">Menunggu aktivitas hardware...</div>
+<p class="small">Milestone jarak sejak game dibuka hari ini dan RPM memberi +5 XP lokal. Bukan reward resmi atau on-chain.</p>
+</section>
+<section class="panel">
+<h3>🎯 Daily Mission</h3>
+<p id="mission">0 / 20 paket benar</p>
+<div class="progress"><div id="bar"></div></div>
+<p class="small">20 paket benar = +20 XP lokal. Reset otomatis berdasarkan tanggal lokal.</p>
+<h3>Total XP: <span id="xp">0</span></h3>
+<p class="small">XP disimpan di browser. Bukan token atau reward on-chain. Data dapat hilang jika data situs dihapus.</p>
+</section>
+<p class="small">Squeek Mailroom V3.3 · Public status API · No wallet connection · No transaction.</p>
+</main>
+<script>
+const API="https://api.squeekchain.com/v1/status";
+const STORAGE="squeekMailroomV31";
+const $=id=>document.getElementById(id);
+function dateKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function freshState(){return{xp:0,dailyDate:dateKey(),dailyCorrect:0,dailyRewardClaimed:false,dailyStartDistance:null,claimed:[],lastRPM:null,specialMessage:"Menunggu milestone hardware..."}}
+function loadState(){
+ try{
+  const old=JSON.parse(localStorage.getItem(STORAGE));
+  if(!old||typeof old!=="object")return freshState();
+  const s={...freshState(),...old};
+  if(!Number.isFinite(s.xp)||s.xp<0)s.xp=0;
+  if(!Array.isArray(s.claimed))s.claimed=[];
+  if(s.dailyDate!==dateKey()){s.dailyDate=dateKey();s.dailyCorrect=0;s.dailyRewardClaimed=false;s.dailyStartDistance=null;s.claimed=[];s.lastRPM=null;s.specialMessage="Hari baru! Milestone harian siap."}
+  return s;
+ }catch(e){return freshState()}
+}
+let state=loadState();
+let score=0,combo=0,lives=3,correctThisGame=0,level=1,current=null;
+let liveRPM=null,packageActive=false,packageStarted=0,packageDuration=9000,timerHandle=null;
+const items=[
+ {emoji:"🍎",type:"FOOD",name:"Fresh Apple"},{emoji:"🍌",type:"FOOD",name:"Banana Box"},{emoji:"🥕",type:"FOOD",name:"Carrot Pack"},
+ {emoji:"🔨",type:"TOOLS",name:"Hammer"},{emoji:"🔧",type:"TOOLS",name:"Wrench"},{emoji:"🪛",type:"TOOLS",name:"Screwdriver"},
+ {emoji:"🧸",type:"TOYS",name:"Teddy Bear"},{emoji:"🚗",type:"TOYS",name:"Toy Car"},{emoji:"⚽",type:"TOYS",name:"Football"}
+];
+function save(){try{localStorage.setItem(STORAGE,JSON.stringify(state))}catch(e){$("message").textContent="Penyimpanan browser tidak tersedia."}}
+function updateUI(){
+ $("score").textContent=score;$("combo").textContent=combo;$("lives").textContent=lives;$("level").textContent=level;$("xp").textContent=state.xp;
+ $("mission").textContent=state.dailyCorrect+" / 20 paket benar"+(state.dailyRewardClaimed?" · SELESAI ✓":"");
+ $("bar").style.width=Math.min(100,state.dailyCorrect/20*100)+"%";$("special").textContent=state.specialMessage;
+}
+function durationFromRPM(rpm){const value=Number.isFinite(rpm)?Math.max(0,Math.min(150,rpm)):0;return Math.round(12000-(value/150)*6000)}
+function syncBeltSpeed(rpm){
+ const value=Number.isFinite(rpm)?Math.max(0,Math.min(150,rpm)):null;
+ const seconds=value===null?1:2.4-(value/150)*1.9;
+ document.documentElement.style.setProperty("--belt-duration",seconds.toFixed(2)+"s");
+}
+function startPackageTimer(){
+ packageActive=true;packageStarted=Date.now();packageDuration=durationFromRPM(liveRPM);
+ $("speed").textContent=liveRPM===null?"PRACTICE":liveRPM.toFixed(1)+" RPM";
+ if(timerHandle)clearInterval(timerHandle);
+ timerHandle=setInterval(()=>{
+  if(!packageActive)return;
+  const remaining=Math.max(0,packageDuration-(Date.now()-packageStarted));
+  $("timeLeft").textContent=(remaining/1000).toFixed(1)+"s";
+  $("timerBar").style.width=(remaining/packageDuration*100)+"%";
+  if(remaining<=0)missedPackage();
+ },100);
+}
+function stopPackageTimer(){packageActive=false;if(timerHandle){clearInterval(timerHandle);timerHandle=null}}
+function newPackage(){
+ current=items[Math.floor(Math.random()*items.length)];
+ $("package").textContent=current.emoji;$("destination").textContent=current.name;
+ startPackageTimer();
+}
+function missedPackage(){
+ if(!packageActive)return;
+ stopPackageTimer();lives--;combo=0;
+ $("message").textContent="Paket terlewat! Conveyor terlalu cepat.";
+ updateUI();
+ if(lives<=0){current=null;$("message").textContent="Game selesai! Tekan Restart Game.";return}
+ newPackage();
+}
+function sort(type){
+ if(!current||!packageActive||lives<=0)return;
+ stopPackageTimer();
+ if(type===current.type){
+  score+=10+Math.min(combo,10)*2;combo++;correctThisGame++;level=Math.floor(correctThisGame/5)+1;
+  state.xp++;state.dailyCorrect++;
+  if(state.dailyCorrect>=20&&!state.dailyRewardClaimed){state.dailyRewardClaimed=true;state.xp+=20;$("message").textContent="DAILY MISSION SELESAI! +20 XP ⭐"}
+  else if(correctThisGame%5===0){$("message").textContent="LEVEL UP! Level "+level+" 🎉"}
+  else{$("message").textContent="Benar! Paket terkirim ✅"}
+ }else{lives--;combo=0;$("message").textContent="Salah tujuan! Paket terlewat."}
+ save();updateUI();
+ if(lives<=0){current=null;$("message").textContent="Game selesai! Tekan Restart Game.";return}
+ newPackage();
+}
+function newGame(){stopPackageTimer();score=0;combo=0;lives=3;correctThisGame=0;level=1;$("message").textContent="Game baru dimulai!";updateUI();newPackage()}
+function claim(key,message){
+ if(state.claimed.includes(key))return false;
+ state.claimed.push(key);state.xp+=5;state.specialMessage="🎁 "+message+" · +5 XP lokal";save();updateUI();$("message").textContent="SPECIAL DELIVERY! +5 XP 🎉";return true;
+}
+function checkNewDay(){
+ if(state.dailyDate===dateKey())return;
+ state.dailyDate=dateKey();state.dailyCorrect=0;state.dailyRewardClaimed=false;state.dailyStartDistance=null;state.claimed=[];state.lastRPM=null;state.specialMessage="Hari baru! Milestone harian siap.";save();updateUI();
+}
+function checkDistance(distance){
+ if(state.dailyStartDistance===null){state.dailyStartDistance=distance;save();return}
+ const reached=Math.floor(Math.max(0,distance-state.dailyStartDistance));
+ for(const km of [1,3,5,10,15])if(reached>=km)claim("distance-"+km,"Jarak sejak game dibuka hari ini: "+km+" km");
+}
+function checkRPM(rpm){
+ const previous=state.lastRPM;
+ if(previous!==null)for(const threshold of [90,120])if(previous<threshold&&rpm>=threshold)claim("rpm-"+threshold,"Speed milestone "+threshold+" RPM");
+ state.lastRPM=rpm;save();
+}
+async function readHardware(){
+ checkNewDay();
+ try{
+  const response=await fetch(API,{cache:"no-store"});if(!response.ok)throw new Error("HTTP "+response.status);
+  const data=await response.json(),m=data.measurement||{},observed=Date.parse(m.observedAt||"");
+  const fresh=Number.isFinite(observed)&&Date.now()-observed>=0&&Date.now()-observed<120000;
+  const valid=m.provenance==="hardware"&&m.freshness==="online"&&fresh&&Number.isFinite(Number(m.rpmMilli))&&Number.isFinite(Number(m.distanceMm));
+  if(!valid)throw new Error("Hardware stale atau tidak tersedia");
+  liveRPM=Number(m.rpmMilli)/1000;syncBeltSpeed(liveRPM);const distance=Number(m.distanceMm)/1000;
+  $("hardware").textContent="● LIVE HARDWARE";$("hardware").className="status green";
+  $("rpm").textContent=liveRPM.toFixed(1);$("distance").textContent=distance.toFixed(2)+" km";
+  $("updated").textContent="Updated: "+new Date(observed).toLocaleTimeString();
+  checkDistance(distance);checkRPM(liveRPM);
+ }catch(error){
+  liveRPM=null;syncBeltSpeed(null);state.lastRPM=null;save();
+  $("hardware").textContent="● PRACTICE MODE";$("hardware").className="status yellow";
+  $("rpm").textContent="--";$("distance").textContent="--";$("updated").textContent="Hardware tidak tersedia: "+error.message;
+ }
+}
+newGame();updateUI();save();syncBeltSpeed(null);readHardware();setInterval(readHardware,5000);
+</script>
+</body>
+</html>
