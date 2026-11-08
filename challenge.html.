@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Squeekchain Challenge Lab</title>
+<style>
+:root{--bg:#0b1020;--panel:#151e33;--text:#edf2ff;--muted:#a6b2ca;--accent:#65e6c1;--line:#293653}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif;line-height:1.6}
+header{text-align:center;padding:28px 16px;background:linear-gradient(135deg,#142d43,#172044)}
+header h1{color:var(--accent);margin:0;font-size:28px}
+header p{color:var(--muted);max-width:620px;margin:8px auto}
+nav{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;background:#10182b;padding:12px;position:sticky;top:0}
+button{background:#202d47;border:1px solid var(--line);color:var(--text);padding:11px 15px;border-radius:9px;cursor:pointer}
+button:hover,button.active{background:var(--accent);color:#071b19}
+main{max-width:850px;margin:24px auto;padding:0 15px}
+section{display:none}
+section.active{display:block}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin:14px 0}
+h2,h3{color:var(--accent)}
+.muted{color:var(--muted)}
+.option{display:block;width:100%;text-align:left;margin:9px 0}
+.result{background:#202d47;padding:13px;border-radius:10px;margin-top:14px}
+.tag{display:inline-block;background:#263b4b;color:var(--accent);padding:4px 9px;border-radius:20px;font-size:12px}
+progress{width:100%;height:14px;accent-color:var(--accent)}
+footer{text-align:center;color:var(--muted);padding:25px;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+<h1>🐿️ Squeekchain Challenge Lab</h1>
+<p>Learn blockchain security through practical decisions, interactive challenges and real-world scenarios.</p>
+<span class="tag">FREE LEARNING LAB · NO WALLET REQUIRED</span>
+</header>
+
+<nav>
+<button class="active" onclick="tab('home',this)">Home</button>
+<button onclick="tab('challenge',this)">Challenges</button>
+<button onclick="tab('lab',this)">Decision Lab</button>
+<button onclick="tab('progress',this)">My Progress</button>
+</nav>
+
+<main>
+<section id="home" class="active">
+<div class="card">
+<h2>Welcome, Builder!</h2>
+<p>This lab helps you practice making safer decisions when interacting with blockchain applications.</p>
+<h3>What you can do</h3>
+<ul>
+<li>Complete practical blockchain challenges.</li>
+<li>Investigate suspicious transaction scenarios.</li>
+<li>Learn about staking and smart contract risks.</li>
+<li>Earn points through correct decisions.</li>
+</ul>
+<button onclick="tab('challenge',document.querySelectorAll('nav button')[1])">Start challenge →</button>
+</div>
+<div class="card">
+<h3>Your current score</h3>
+<h2 id="homeScore">0 XP</h2>
+<p class="muted">Earn XP by completing challenges for the first time.</p>
+</div>
+</section>
+
+<section id="challenge">
+<h2>Blockchain challenges</h2>
+<p class="muted">Choose an answer. Each challenge awards 10 XP on its first correct completion.</p>
+<div id="challengeList"></div>
+</section>
+
+<section id="lab">
+<h2>Decision Lab</h2>
+<div class="card">
+<span class="tag">SCENARIO SIMULATION</span>
+<h3 id="scenarioTitle"></h3>
+<p id="scenarioText"></p>
+<div id="scenarioOptions"></div>
+<div id="scenarioResult" class="result">Choose an action to see its consequences.</div>
+<button id="nextScenario" onclick="nextScenario()" style="display:none;margin-top:12px">Next scenario →</button>
+</div>
+</section>
+
+<section id="progress">
+<h2>Builder progress</h2>
+<div class="card">
+<h3>Total XP</h3>
+<h2 id="totalXP">0 XP</h2>
+<h3>Challenge completion</h3>
+<p id="completedCount">0 of 5 completed</p>
+<progress id="progressBar" value="0" max="5"></progress>
+<h3>Decision Lab</h3>
+<p id="labCount">0 of 3 completed</p>
+<button onclick="resetAll()">Reset progress</button>
+</div>
+</section>
+</main>
+
+<footer>
+<p>Squeekchain Challenge Lab — Independent educational project.</p>
+<p>All scenarios are educational simulations, not live blockchain transactions or financial advice.</p>
+<p>Always verify current network and protocol information using official documentation.</p>
+</footer>
+
+<script>
+const defaults={xp:0,done:[],lab:[]};
+let state;
+try{state=JSON.parse(localStorage.getItem("squeekChallenge")||"null")||structuredClone(defaults)}
+catch(e){state={...defaults}}
+function save(){
+ localStorage.setItem("squeekChallenge",JSON.stringify(state));
+ updateProgress();
+}
+function tab(id,btn){
+ document.querySelectorAll("main section").forEach(s=>s.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+ btn.classList.add("active");
+ if(id==="progress")updateProgress();
+}
+const challenges=[
+ {q:"A website asks for your seed phrase to unlock a free reward. What is the safest action?",a:["Enter it to claim the reward","Leave the website and never share the phrase","Send it to support"],c:1,e:"A seed phrase gives control over wallet assets. Never share it."},
+ {q:"A smart contract requests unlimited token approval. What should you do?",a:["Approve immediately","Investigate the contract and use limited permissions where possible","Ignore the warning"],c:1,e:"Unlimited approvals can expose tokens to risk. Understand and minimize permissions."},
+ {q:"A staking service promises guaranteed high returns. What is the best response?",a:["Deposit everything","Check official documentation, risks and contract details","Trust its advertisement"],c:1,e:"Returns are not guaranteed. Research the protocol and its risks."},
+ {q:"You receive a token from an unknown address. What should you do?",a:["Visit any link in its description","Investigate without connecting your wallet or signing anything","Approve its contract"],c:1,e:"Unknown tokens may be used in scams. Avoid interacting with suspicious links or contracts."},
+ {q:"Before signing a blockchain transaction, what matters most?",a:["The website's colors","The transaction details, destination and permissions","The number of followers"],c:1,e:"Understand exactly what the signature or transaction authorizes."}
+];
+function renderChallenges(){
+ const box=document.getElementById("challengeList");box.innerHTML="";
+ challenges.forEach((q,i)=>{
+  const card=document.createElement("div");card.className="card";
+  const title=document.createElement("h3");title.textContent="Challenge "+(i+1);
+  const question=document.createElement("p");question.textContent=q.q;
+  const result=document.createElement("div");result.className="result";result.textContent=state.done.includes(i)?"✓ Completed — "+q.e:"Choose an answer.";
+  card.append(title,question);
+  q.a.forEach((a,j)=>{
+   const b=document.createElement("button");b.className="option";b.textContent=a;
+   b.onclick=()=>{
+    if(j===q.c){
+     if(!state.done.includes(i)){state.done.push(i);state.xp+=10;save()}
+     result.textContent="Correct! +10 XP. "+q.e;
+    }else result.textContent="Not quite. Try again. Hint: prioritize wallet safety.";
+   };
+   card.appendChild(b);
+  });
+  card.appendChild(result);box.appendChild(card);
+ });
+}
+const scenarios=[
+ {title:"Scenario 1 — Suspicious approval",text:"A new dApp requests permission to spend all your tokens. You do not recognize the contract.",a:["Approve to continue","Stop and investigate the contract"],c:1,e:"You avoided an unnecessary approval. Verify the contract and permissions before interacting."},
+ {title:"Scenario 2 — Staking lock period",text:"A staking protocol has a withdrawal lock period. You may need your tokens tomorrow.",a:["Stake without checking","Read the lock and withdrawal rules first"],c:1,e:"Understanding withdrawal conditions helps prevent unexpected loss of access."},
+ {title:"Scenario 3 — Fake support message",text:"Someone claiming to be official support asks you to send your private key.",a:["Send the key","Ignore and report the message"],c:1,e:"Legitimate support should never need your private key or seed phrase."}
+];
+let si=0,labAnswered=false;
+function renderScenario(){
+ const s=scenarios[si];labAnswered=false;
+ document.getElementById("scenarioTitle").textContent=s.title;
+ document.getElementById("scenarioText").textContent=s.text;
+ document.getElementById("scenarioResult").textContent="Choose an action to see its consequences.";
+ document.getElementById("nextScenario").style.display="none";
+ const box=document.getElementById("scenarioOptions");box.innerHTML="";
+ s.a.forEach((a,i)=>{
+  const b=document.createElement("button");b.className="option";b.textContent=a;
+  b.onclick=()=>{
+   if(labAnswered)return;
+   if(i===s.c){
+    labAnswered=true;
+    if(!state.lab.includes(si)){state.lab.push(si);state.xp+=10;save()}
+    document.getElementById("scenarioResult").textContent="Good decision! +10 XP. "+s.e;
+    document.getElementById("nextScenario").style.display="inline-block";
+   }else document.getElementById("scenarioResult").textContent="Risky choice. Review the situation and try again.";
+  };
+  box.appendChild(b);
+ });
+}
+function nextScenario(){
+ si=(si+1)%scenarios.length;
+ renderScenario();
+}
+function updateProgress(){
+ document.getElementById("homeScore").textContent=state.xp+" XP";
+ document.getElementById("totalXP").textContent=state.xp+" XP";
+ document.getElementById("completedCount").textContent=state.done.length+" of 5 completed";
+ document.getElementById("progressBar").value=state.done.length;
+ document.getElementById("labCount").textContent=state.lab.length+" of 3 completed";
+}
+function resetAll(){
+ if(confirm("Reset all Challenge Lab progress?")){
+  state={...defaults,done:[],lab:[]};save();renderChallenges();renderScenario();
+ }
+}
+renderChallenges();renderScenario();updateProgress();
+</script>
+</body>
+</html>
