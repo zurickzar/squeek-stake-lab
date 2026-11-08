@@ -69,3 +69,5 @@ This is an independently developed project. Genesis attribution and verification
 Disclaimer
 
 XP, levels, and gameplay bonuses are local in-game progress only. They are not official tokens, guaranteed financial value, or confirmed on-chain rewards.
+
+squeekchain-project: 7af434d0-7c8f-4230-96ee-d899b6fe5a4c
