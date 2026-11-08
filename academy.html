@@ -1,0 +1,226 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Squeek Academy</title>
+<style>
+:root{--bg:#0b1020;--panel:#151e33;--text:#edf2ff;--muted:#a6b2ca;--accent:#65e6c1;--line:#293653}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif;line-height:1.6}
+header{padding:28px 18px;background:linear-gradient(135deg,#142d43,#172044);text-align:center}
+header h1{margin:0;font-size:30px;color:var(--accent)}
+header p{color:var(--muted);margin:8px auto;max-width:600px}
+nav{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:14px;background:#10182b;position:sticky;top:0}
+button{border:1px solid var(--line);background:#202d47;color:var(--text);padding:10px 15px;border-radius:10px;cursor:pointer}
+button.active,button:hover{background:var(--accent);color:#071b19}
+main{max-width:850px;margin:24px auto;padding:0 15px}
+section{display:none}
+section.active{display:block}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:20px;margin:14px 0}
+h2,h3{color:var(--accent)}
+small,.muted{color:var(--muted)}
+.lesson{border-left:3px solid var(--accent);padding-left:14px;margin:18px 0}
+.option{display:block;width:100%;text-align:left;margin:8px 0}
+.result{padding:12px;border-radius:10px;margin-top:12px;background:#202d47}
+progress{width:100%;height:14px;accent-color:var(--accent)}
+a{color:var(--accent)}
+footer{text-align:center;color:var(--muted);padding:30px 15px;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+<h1>🐿️ Squeek Academy</h1>
+<p>Learn Web3, understand Squeekchain, and test your knowledge through interactive challenges.</p>
+</header>
+
+<nav>
+<button class="active" onclick="showTab('home',this)">Home</button>
+<button onclick="showTab('lessons',this)">Lessons</button>
+<button onclick="showTab('practice',this)">Practice</button>
+<button onclick="showTab('quiz',this)">Quiz</button>
+<button onclick="showTab('progress',this)">Progress</button>
+</nav>
+
+<main>
+<section id="home" class="active">
+<div class="card">
+<h2>Welcome to Squeek Academy</h2>
+<p>A small interactive learning experience for people exploring blockchain and Squeekchain.</p>
+<h3>Your learning journey</h3>
+<p>Complete lessons, make decisions in practice scenarios, and test yourself with quizzes.</p>
+<button onclick="showTab('lessons',document.querySelectorAll('nav button')[1])">Start learning →</button>
+</div>
+<div class="card">
+<h3>What you will learn</h3>
+<ul>
+<li>Blockchain fundamentals</li>
+<li>Wallets and transaction safety</li>
+<li>Staking concepts</li>
+<li>Smart contract interactions</li>
+<li>How to research a blockchain project</li>
+</ul>
+</div>
+</section>
+
+<section id="lessons">
+<h2>Learning lessons</h2>
+<div class="card lesson">
+<h3>Lesson 1 — Blockchain basics</h3>
+<p>A blockchain is a shared digital record maintained by a network of computers. Transactions are grouped into blocks and linked together.</p>
+<p><b>Remember:</b> A transaction being visible on-chain does not automatically mean a project or contract is safe.</p>
+<button onclick="completeLesson(1,this)">Mark as completed</button>
+</div>
+<div class="card lesson">
+<h3>Lesson 2 — Wallet safety</h3>
+<p>A wallet lets you manage blockchain accounts and authorize transactions.</p>
+<p><b>Safety rule:</b> Never share your seed phrase or private key. Check the network, destination, and requested permissions before signing.</p>
+<button onclick="completeLesson(2,this)">Mark as completed</button>
+</div>
+<div class="card lesson">
+<h3>Lesson 3 — Staking</h3>
+<p>Staking generally means committing eligible tokens to support a blockchain mechanism or staking protocol.</p>
+<p>Rewards, lock periods, withdrawal rules, and risks depend on the specific network and protocol.</p>
+<button onclick="completeLesson(3,this)">Mark as completed</button>
+</div>
+<div class="card lesson">
+<h3>Lesson 4 — Smart contracts</h3>
+<p>Smart contracts are programs deployed on a blockchain. Interacting with one can change on-chain state or move assets.</p>
+<p>Read the contract details and understand the transaction before approving it.</p>
+<button onclick="completeLesson(4,this)">Mark as completed</button>
+</div>
+</section>
+
+<section id="practice">
+<h2>Practice scenarios</h2>
+<div class="card">
+<h3>Scenario 1 — Suspicious wallet request</h3>
+<p>A website asks you to enter your seed phrase to claim a reward. What should you do?</p>
+<button class="option" onclick="practiceAnswer(0)">A. Enter the seed phrase</button>
+<button class="option" onclick="practiceAnswer(1)">B. Stop and leave the website</button>
+<div id="practiceResult" class="result">Choose an answer to see the explanation.</div>
+</div>
+<div class="card">
+<h3>Scenario 2 — Unknown transaction</h3>
+<p>Your wallet shows a transaction requesting token approval for an unfamiliar contract.</p>
+<button class="option" onclick="practiceAnswer2(0)">A. Approve immediately</button>
+<button class="option" onclick="practiceAnswer2(1)">B. Investigate the contract and permissions first</button>
+<div id="practiceResult2" class="result">Choose an answer to see the explanation.</div>
+</div>
+</section>
+
+<section id="quiz">
+<h2>Knowledge quiz</h2>
+<div class="card">
+<p id="questionCount">Question 1 of 5</p>
+<h3 id="question">What should never be shared with another person?</h3>
+<div id="answers"></div>
+<div id="quizResult" class="result">Select an answer.</div>
+<button id="nextBtn" onclick="nextQuestion()" style="display:none;margin-top:12px">Next question →</button>
+</div>
+</section>
+
+<section id="progress">
+<h2>Your progress</h2>
+<div class="card">
+<h3>Completed lessons</h3>
+<p id="lessonCount">0 of 4 lessons completed</p>
+<progress id="lessonBar" value="0" max="4"></progress>
+<h3>Practice scenarios</h3>
+<p id="practiceCount">0 of 2 completed</p>
+<h3>Quiz best score</h3>
+<p id="bestScore">Not attempted yet</p>
+<button onclick="resetProgress()">Reset my progress</button>
+</div>
+</section>
+</main>
+
+<footer>
+<p>Squeek Academy — Independent educational project.</p>
+<p>Learning resource, not financial advice. Always verify current information using official documentation.</p>
+<p><a href="https://docs.squeekchain.com/" target="_blank" rel="noopener">Explore official Squeekchain documentation</a></p>
+</footer>
+
+<script>
+const getData=()=>JSON.parse(localStorage.getItem("squeekAcademy")||'{"lessons":[],"practice":[],"best":0}');
+let data=getData();
+function save(){localStorage.setItem("squeekAcademy",JSON.stringify(data));updateProgress()}
+function showTab(id,btn){
+ document.querySelectorAll("main section").forEach(s=>s.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+ btn.classList.add("active");
+ if(id==="progress")updateProgress();
+}
+function completeLesson(n,btn){
+ if(!data.lessons.includes(n))data.lessons.push(n);
+ btn.textContent="✓ Completed";
+ save();
+}
+function practiceAnswer(n){
+ const el=document.getElementById("practiceResult");
+ if(n===1){el.textContent="Correct! Never share a seed phrase. A legitimate reward should not require it.";if(!data.practice.includes(1))data.practice.push(1)}
+ else el.textContent="Not safe. Never enter your seed phrase on an unknown website.";
+ save();
+}
+function practiceAnswer2(n){
+ const el=document.getElementById("practiceResult2");
+ if(n===1){el.textContent="Correct! Investigate the contract and understand the permissions before approving.";if(!data.practice.includes(2))data.practice.push(2)}
+ else el.textContent="Incorrect. Unknown approvals can put your assets at risk.";
+ save();
+}
+const questions=[
+ {q:"What should never be shared?",a:["Public wallet address","Seed phrase","Transaction hash"],c:1,e:"A seed phrase gives control over the wallet."},
+ {q:"What is a blockchain?",a:["A shared digital ledger","A social media account","A password manager"],c:0,e:"A blockchain is a shared ledger maintained by a network."},
+ {q:"What does staking involve?",a:["Always buying an NFT","Committing eligible tokens under protocol rules","Sharing a private key"],c:1,e:"Staking rules and risks depend on the protocol."},
+ {q:"What should you do before signing an unfamiliar transaction?",a:["Approve quickly","Check the details and permissions","Share your seed phrase"],c:1,e:"Understand the transaction before authorizing it."},
+ {q:"Does an on-chain transaction guarantee a project is safe?",a:["Yes, always","No","Only if it has a logo"],c:1,e:"On-chain visibility does not prove a project is trustworthy."}
+];
+let qi=0,score=0,answered=false;
+function renderQuestion(){
+ answered=false;
+ document.getElementById("questionCount").textContent=`Question ${qi+1} of ${questions.length}`;
+ document.getElementById("question").textContent=questions[qi].q;
+ document.getElementById("quizResult").textContent="Select an answer.";
+ document.getElementById("nextBtn").style.display="none";
+ const box=document.getElementById("answers");box.innerHTML="";
+ questions[qi].a.forEach((a,i)=>{
+  const b=document.createElement("button");b.className="option";b.textContent=a;
+  b.onclick=()=>answerQuiz(i);box.appendChild(b);
+ });
+}
+function answerQuiz(i){
+ if(answered)return;answered=true;
+ const q=questions[qi];
+ if(i===q.c)score++;
+ document.getElementById("quizResult").textContent=(i===q.c?"Correct! ":"Not quite. ")+q.e;
+ document.getElementById("nextBtn").style.display="inline-block";
+}
+function nextQuestion(){
+ qi++;
+ if(qi<questions.length){renderQuestion();return}
+ data.best=Math.max(data.best,score);save();
+ document.getElementById("questionCount").textContent="Quiz completed";
+ document.getElementById("question").textContent=`Your score: ${score} / ${questions.length}`;
+ document.getElementById("answers").innerHTML="";
+ document.getElementById("quizResult").textContent="Review the lessons and try again to improve your score.";
+ document.getElementById("nextBtn").textContent="Try again";
+ document.getElementById("nextBtn").onclick=()=>{qi=0;score=0;document.getElementById("nextBtn").onclick=nextQuestion;document.getElementById("nextBtn").textContent="Next question →";renderQuestion()};
+}
+function updateProgress(){
+ document.getElementById("lessonCount").textContent=`${data.lessons.length} of 4 lessons completed`;
+ document.getElementById("lessonBar").value=data.lessons.length;
+ document.getElementById("practiceCount").textContent=`${data.practice.length} of 2 completed`;
+ document.getElementById("bestScore").textContent=data.best?`${data.best} / 5`:"Not attempted yet";
+}
+function resetProgress(){
+ if(confirm("Reset all saved learning progress?")){
+  data={lessons:[],practice:[],best:0};save();
+  document.querySelectorAll(".lesson button").forEach(b=>b.textContent="Mark as completed");
+ }
+}
+renderQuestion();updateProgress();
+</script>
+</body>
+</html>
